@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/receive_text"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_weight="1"
+        android:freezesText="true"
+        android:gravity="bottom"
+        android:keepScreenOn="true"
+        android:scrollbars="vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <View
+        android:layout_width="match_parent"
+        android:background="?android:attr/listDivider"
+        android:layout_height="2dp" />
+
+    <ScrollView
+        android:id="@+id/table_scrolltainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="1600px"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/debugText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Debug msg: " />
+
+                <CheckBox
+                    android:id="@+id/debugOn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Debug" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewInfo"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Current Alt and Sat count" />
+
+                <CheckBox
+                    android:id="@+id/altFixCheck"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fix Base Alt" />
+
+                <Button
+                    android:id="@+id/reset_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reset" />
+            </LinearLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:keepScreenOn="true"
+                android:minHeight="1400px"
+                android:padding="3dp">
+
+                <TableRow
+                    android:id="@+id/tbHeaderRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border"
+                    android:textAlignment="center">
+
+                    <TextView
+                        android:id="@+id/textView7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="Altitude"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="Speed"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/textView9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="Dir"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/textView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/textView11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSDir"
+                        android:textAlignment="center" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb100mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text100mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="90-110m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text100mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text100mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text100mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text100mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb200mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text200mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="190-210m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text200mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text200mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text200mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text200mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+            </TableLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/send_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="text|textNoSuggestions"
+            android:singleLine="true" />
+
+        <ImageButton
+            android:id="@+id/send_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_send_white_24dp" />
+    </LinearLayout>
+
+</LinearLayout>
+
