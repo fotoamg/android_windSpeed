@@ -1,4 +1,4 @@
-package hu.fotoamg.wind_speed;
+package hu.fotoamg.windspeed;
 
 class Constants {
 

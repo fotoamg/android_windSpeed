@@ -1,4 +1,4 @@
-package hu.fotoamg.wind_speed;
+package hu.fotoamg.windspeed;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,8 +42,19 @@ import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+import hu.fotoamg.windspeed.nmea.INmeaHandler;
+import hu.fotoamg.windspeed.nmea.NmeaReceiver;
+import hu.fotoamg.windspeed.nmea.Sentences.GGA;
+import hu.fotoamg.windspeed.nmea.Sentences.GSA;
+import hu.fotoamg.windspeed.nmea.Sentences.GST;
+import hu.fotoamg.windspeed.nmea.Sentences.GSV;
+import hu.fotoamg.windspeed.nmea.Sentences.HDT;
+import hu.fotoamg.windspeed.nmea.Sentences.RMC;
+import hu.fotoamg.windspeed.nmea.Sentences.VTG;
+import java.nio.charset.StandardCharsets;
 
-public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener {
+
+public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener, INmeaHandler {
     //Permision code that will be checked in the method onRequestPermissionsResult
     private int STORAGE_PERMISSION_CODE = 23;
 
@@ -55,13 +66,23 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     private TextView receiveText;
     private TextView debugText;
+    private TextView altSatText;
 
     private CheckBox debugCheckBox;
+    private CheckBox parseCheckBox;
+    private CheckBox altCheckBox;
 
     private SerialSocket socket;
     private SerialService service;
     private boolean initialStart = true;
     private Connected connected = Connected.False;
+
+    // ... Create the NMEA receiver
+    private NmeaReceiver nmeaReceiver = new NmeaReceiver( this ) ;
+
+    private float baseAlt = 0f;
+    private float currAlt = 0f;
+
 
     public TerminalFragment() {
     }
@@ -75,6 +96,29 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         setHasOptionsMenu(true);
         setRetainInstance(true);
         deviceAddress = getArguments().getString("device");
+
+
+        // ... Attach handler for NMEA messages that fail NMEA checksum verification
+        nmeaReceiver.setMessageHandlers( new NmeaReceiver.MessageHandlers() {
+            @Override
+            public void OnNmeaMessageFailedChecksum( byte[] bytes, int index, int count, byte expected, byte actual ) {
+                String sentence = new String(bytes, index, count, StandardCharsets.US_ASCII ) ;
+                appendDebug("Failed Checksum: " + sentence + "; expected "+expected+" but got " + actual );
+
+            }
+
+            @Override
+            public void OnNmeaMessageDropped( byte[] bytes, int index, int count, String reason ) {
+                String sentence = new String(bytes, index, count, StandardCharsets.US_ASCII ) ;
+                appendDebug("Bad Syntax: "+sentence+"; reason: "+reason );
+            }
+
+            @Override
+            public void OnNmeaMessageIgnored( byte[] bytes, int index, int count ) {
+                String sentence = new String(bytes, index, count, StandardCharsets.US_ASCII ) ;
+                appendDebug("Ignored: " + sentence ) ;
+            }
+        } ) ;
     }
 
     @Override
@@ -145,14 +189,21 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         View view = inflater.inflate(R.layout.fragment_terminal, container, false);
         receiveText = view.findViewById(R.id.receive_text);                          // TextView performance decreases with number of spans
         receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
-        receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
+        //receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
+
         debugText = view.findViewById(R.id.debugText);
         debugCheckBox = view.findViewById(R.id.debugOn);
+        parseCheckBox = view.findViewById(R.id.parseOn);
+        altCheckBox =  view.findViewById(R.id.altFixCheck);
+
         TextView sendText = view.findViewById(R.id.send_text);
         View sendBtn = view.findViewById(R.id.send_btn);
         sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
         View resetBtn = view.findViewById(R.id.reset_btn);
         resetBtn.setOnClickListener(v -> resetClick(view));
+
+        altCheckBox.setOnClickListener(v -> altFixClick(view));
+        altSatText = view.findViewById(R.id.altSatCount);
 
         return view;
     }
@@ -240,6 +291,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     private void receive(byte[] data) {
         receiveText.append(new String(data));
+        if(parseCheckBox.isChecked()) nmeaReceiver.Receive( data ) ;
     }
 
     private void status(String str) {
@@ -275,7 +327,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     private void appendDebug(String str) {
-        if (debugCheckBox.isChecked()) {
+        if (debugText != null && debugCheckBox.isChecked()) {
             debugText.append("\n");
             debugText.append(str);
         }
@@ -283,8 +335,18 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     public void resetClick(View view) {
         debugText.setText("Debug msg:");
-        appendDebug(" RESET nyomva!");
+        appendDebug(" RESET pushed!\n");
     }
+
+
+    public void altFixClick(View view) {
+        appendDebug(" Alt FIX clicked! " + (altCheckBox.isChecked() ? "ON" :  "OFF") + "\n");
+        if (altCheckBox.isChecked()) {
+            baseAlt = currAlt;
+        }
+
+    }
+
 
     public void saveLog() {
         String text = receiveText.getText().toString();
@@ -408,5 +470,41 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_CODE);
     }
 
+    @Override
+    public void HandleGGA(GGA msg) {
+        currAlt =  msg.get_altitude();
+        appendDebug(" GGA received, alt: " + currAlt + " sats: " + msg.get_satelliteCount());
+        altSatText.setText(" Alt:" + (currAlt-baseAlt) + " NrSats: " + msg.get_satelliteCount());
+    }
+
+    @Override
+    public void HandleGSA(GSA msg) {
+
+    }
+
+    @Override
+    public void HandleGST(GST msg) {
+
+    }
+
+    @Override
+    public void HandleGSV(GSV msg) {
+
+    }
+
+    @Override
+    public void HandleHDT(HDT msg) {
+
+    }
+
+    @Override
+    public void HandleRMC(RMC msg) {
+        appendDebug(" RMC received!");
+    }
+
+    @Override
+    public void HandleVTG(VTG msg) {
+        appendDebug(" VTG speed: " + msg.get_groundSpeedKph() + "kph true dir: " + msg.get_trueTrackMadeGoodDegrees());
+    }
 
 }

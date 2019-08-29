@@ -1,4 +1,4 @@
-package hu.fotoamg.wind_speed;
+package hu.fotoamg.windspeed;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;

@@ -1,4 +1,4 @@
-package hu.fotoamg.wind_speed;
+package hu.fotoamg.windspeed;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
