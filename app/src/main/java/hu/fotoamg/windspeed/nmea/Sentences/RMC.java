@@ -110,7 +110,7 @@ public class RMC extends BaseNmeaMessage {
     @Override
     public RMC parseFields( String[] tokens ) {
         set_dataTypeName( tokens[0].trim().substring(1) );
-        set_utc( DateTime.parse( tokens[9] + " " + tokens[1], _utcFormatter )) ;
+        if (tokens[9].length() + tokens[1].length() > 10) set_utc( DateTime.parse( tokens[9] + " " + tokens[1], _utcFormatter )) ;
         set_status( StatusEnum.FromNmeaString(tokens[2]) );
         set_latitude( Latitude.Parse(tokens[3]+ DELIM_FIELDS + tokens[4], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact) );
         set_longitude( Longitude.Parse(tokens[5]+ DELIM_FIELDS + tokens[6], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact) );

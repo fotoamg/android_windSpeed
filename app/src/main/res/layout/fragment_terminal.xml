@@ -153,6 +153,59 @@
                 </TableRow>
 
                 <TableRow
+                    android:id="@+id/tb0mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text0mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="Ground"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text0mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text0mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text0mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text0mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+
+                </TableRow>
+
+                <TableRow
                     android:id="@+id/tb100mRow"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -256,6 +309,527 @@
                         android:text="MaxSpdDir"
                         android:textAlignment="textEnd" />
                 </TableRow>
+                <TableRow
+                    android:id="@+id/tb300mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text300mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="300m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text300mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text300mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text300mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text300mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+                <TableRow
+                    android:id="@+id/tb400mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text400mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="400m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text400mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text400mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text400mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text400mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb500mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text500mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="500m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text500mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text500mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text500mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text500mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb600mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text600mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="600m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text600mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text600mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text600mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text600mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb700mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text700mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="700m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text700mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text700mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text700mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text700mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb800mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text800mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="800m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text800mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text800mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text800mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text800mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb900mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text900mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="900m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text900mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text900mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text900mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text900mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+
+                <TableRow
+                    android:id="@+id/tb1000mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text1000mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="1000m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1000mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1000mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1000mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1000mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tb1100mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text1100mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="1100m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1100mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1100mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1100mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1100mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
+
+                <TableRow
+                    android:id="@+id/tb1200mRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <TextView
+                        android:id="@+id/text1200mLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="1200m"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1200mSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="windspd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1200mDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="winddir"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1200mMaxSpd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpd"
+                        android:textAlignment="textEnd" />
+
+                    <TextView
+                        android:id="@+id/text1200mMaxDir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border"
+                        android:padding="3dp"
+                        android:text="MaxSpdDir"
+                        android:textAlignment="textEnd" />
+                </TableRow>
+
 
             </TableLayout>
 

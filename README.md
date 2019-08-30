@@ -14,6 +14,8 @@ Current version is modified to collect data by a quadcopter and having the trans
 
 ![Image of Screen](doc/screen1.jpg) 
 
+![Image of Screen](doc/windparse1.jpg) 
+
 ## The Original App used here for BT2.0 serial communication:
 
 [Serial Bluetooth Terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal) app.

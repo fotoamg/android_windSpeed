@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -51,7 +52,14 @@ import hu.fotoamg.windspeed.nmea.Sentences.GSV;
 import hu.fotoamg.windspeed.nmea.Sentences.HDT;
 import hu.fotoamg.windspeed.nmea.Sentences.RMC;
 import hu.fotoamg.windspeed.nmea.Sentences.VTG;
+import hu.fotoamg.windspeed.nmea.Types.GeoAngleFormat;
+import hu.fotoamg.windspeed.nmea.Types.GeoAngleFormatOptions;
+import hu.fotoamg.windspeed.nmea.Types.Survey;
+
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener, INmeaHandler {
@@ -83,10 +91,36 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private float baseAlt = 0f;
     private float currAlt = 0f;
 
+    private GGA lastGGA = null;
+    private RMC lastRMC = null;
+    private VTG lastVTG = null;
+
+    private Survey survey = new Survey();
+    Map<Integer, TextView> speedCols  = new HashMap<>();
+    Map<Integer, TextView> dirCols  = new HashMap<>();
 
     public TerminalFragment() {
     }
 
+
+    void initTextCols(View view) {
+        //TextView sendText = view.findViewById(R.id.send_text);
+        for(int i = 0; i<1300; i+=100) {
+            Integer key = new Integer(i);
+            int resID = getResources().getIdentifier("text" + i + "mSpd", "id", getActivity().getPackageName());
+            TextView speedView = (TextView)view.findViewById(resID ); // ex: text1200mSpd
+            if(speedView!= null) {
+                speedCols.put(key, speedView);
+            }
+
+            resID = getResources().getIdentifier("text" + i + "mDir", "id", getActivity().getPackageName());
+            TextView dirView = (TextView)view.findViewById(resID ); // ex: text1200mDir
+            if(dirView!= null) {
+                dirCols.put(key, dirView);
+            }
+
+        }
+    }
     /*
      * Lifecycle
      */
@@ -204,6 +238,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
         altCheckBox.setOnClickListener(v -> altFixClick(view));
         altSatText = view.findViewById(R.id.altSatCount);
+        initTextCols(view);
 
         return view;
     }
@@ -470,11 +505,18 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_CODE);
     }
 
+    int getRelativeCurrAlt() {
+        return Math.round((currAlt-baseAlt));
+    }
+
     @Override
     public void HandleGGA(GGA msg) {
-        currAlt =  msg.get_altitude();
-        appendDebug(" GGA received, alt: " + currAlt + " sats: " + msg.get_satelliteCount());
-        altSatText.setText(" Alt:" + (currAlt-baseAlt) + " NrSats: " + msg.get_satelliteCount());
+        lastGGA = msg;
+        currAlt = msg.get_altitude();
+        //appendDebug(" GGA received, alt: " + currAlt + " sats: " + msg.get_satelliteCount());
+        if (!altCheckBox.isChecked()) {
+            altSatText.setText(" Alt:" + getRelativeCurrAlt() + " NrSats: " + msg.get_satelliteCount());
+        }
     }
 
     @Override
@@ -499,12 +541,46 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     @Override
     public void HandleRMC(RMC msg) {
-        appendDebug(" RMC received!");
+        lastRMC = msg;
+        //appendDebug(" RMC received!");
     }
 
     @Override
     public void HandleVTG(VTG msg) {
-        appendDebug(" VTG speed: " + msg.get_groundSpeedKph() + "kph true dir: " + msg.get_trueTrackMadeGoodDegrees());
+        lastVTG = msg;
+        //appendDebug(" VTG speed: " + msg.get_groundSpeedKph() + "kph true dir: " + msg.get_trueTrackMadeGoodDegrees());
+        Map.Entry<Float, Float> medianSpeedEntry = null;
+
+        if(parseCheckBox.isChecked() && altCheckBox.isChecked()) {
+            Integer range = survey.getAltRangeKey(getRelativeCurrAlt());
+
+            if (range != null)
+                medianSpeedEntry = survey.addSpeedData(range, msg.get_groundSpeedKph(), msg.get_trueTrackMadeGoodDegrees());
+
+            if (medianSpeedEntry != null) {
+                String debugStr = " Alt:" + getRelativeCurrAlt()
+                        +  (lastGGA !=null ? " NrSats: " + lastGGA.get_satelliteCount() : "" )
+                        + " Spd: " + medianSpeedEntry.getKey()
+                        + " Dir: " + medianSpeedEntry.getValue()
+                        + (lastGGA !=null ? "\n" + lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
+                            + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) + " \n" : "" );
+                appendDebug( debugStr + " Range: " + range.intValue() );
+                altSatText.setText(debugStr);
+                updateUI(range, medianSpeedEntry);
+            }
+        }
+
     }
 
+    private void updateUI(Integer range, Map.Entry<Float, Float> medianSpeedEntry) {
+            TextView speedText = speedCols.get(range);
+            if(speedText != null) {
+                speedText.setText(medianSpeedEntry.getKey().floatValue() + " km/h");
+            }
+
+            TextView dirText = dirCols.get(range);
+            if(dirText != null) {
+                dirText.setText(medianSpeedEntry.getValue().floatValue() + " deg");
+            }
+    }
 }
