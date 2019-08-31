@@ -101,15 +101,17 @@ public class GGA extends BaseNmeaMessage {
 
     @Override
     public GGA parseFields( String[] tokens ) {
-        set_dataTypeName( tokens[0].trim().substring(1) );
-        set_utc( LocalTime.parse( tokens[1], _utcFormatter ) ) ;
-        set_latitude( Latitude.Parse(tokens[2]+ DELIM_FIELDS + tokens[3], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact) );
-        set_longitude( Longitude.Parse(tokens[4]+ DELIM_FIELDS + tokens[5], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact) );
-        set_fixQuality( FixQualityEnum.values()[Integer.valueOf(tokens[6])] );
-        set_satelliteCount( Integer.valueOf(tokens[7]));
-        set_hdop( Float.valueOf(tokens[8]));
-        set_altitude( Float.valueOf(tokens[9]));
-        set_geoidHeight( Float.valueOf( tokens[11] ));
+        if (!tokens[0].isEmpty()) set_dataTypeName( tokens[0].trim().substring(1) );
+        if (!tokens[1].isEmpty()) set_utc( LocalTime.parse( tokens[1], _utcFormatter ) ) ;
+        if ((!tokens[2].isEmpty()) && (!tokens[3].isEmpty()) && (!tokens[4].isEmpty()) && (!tokens[5].isEmpty())  ) {
+            set_latitude(Latitude.Parse(tokens[2] + DELIM_FIELDS + tokens[3], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact));
+            set_longitude(Longitude.Parse(tokens[4] + DELIM_FIELDS + tokens[5], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact));
+        }
+        if (!tokens[6].isEmpty()) set_fixQuality( FixQualityEnum.values()[Integer.valueOf(tokens[6])] );
+        if (!tokens[7].isEmpty()) set_satelliteCount( Integer.valueOf(tokens[7]));
+        if (!tokens[8].isEmpty()) set_hdop( Float.valueOf(tokens[8]));
+        if (!tokens[9].isEmpty()) set_altitude( Float.valueOf(tokens[9]));
+        if (!tokens[11].isEmpty()) set_geoidHeight( Float.valueOf( tokens[11] ));
         return this ;
     }
 

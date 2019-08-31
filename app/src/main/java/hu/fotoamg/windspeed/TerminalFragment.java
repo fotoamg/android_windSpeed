@@ -8,6 +8,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +66,7 @@ import java.util.TreeMap;
 
 
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener, INmeaHandler {
+    public static final String CHR_DEG = "\u00b0";
     //Permision code that will be checked in the method onRequestPermissionsResult
     private int STORAGE_PERMISSION_CODE = 23;
 
@@ -75,6 +79,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private TextView receiveText;
     private TextView debugText;
     private TextView altSatText;
+    private TextView latLonText;
+    private TextView speedDirText;
 
     private CheckBox debugCheckBox;
     private CheckBox parseCheckBox;
@@ -98,6 +104,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private Survey survey = new Survey();
     Map<Integer, TextView> speedCols  = new HashMap<>();
     Map<Integer, TextView> dirCols  = new HashMap<>();
+    Map<Integer, TextView> speedMaxCols  = new HashMap<>();
+    Map<Integer, TextView> dirMaxCols  = new HashMap<>();
+    Drawable defBackGround = null;
 
     public TerminalFragment() {
     }
@@ -119,7 +128,21 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                 dirCols.put(key, dirView);
             }
 
+            resID = getResources().getIdentifier("text" + i + "mMaxSpd", "id", getActivity().getPackageName());
+            TextView speedMaxView = (TextView)view.findViewById(resID ); // ex: text1200mMaxSpd
+            if(speedMaxView!= null) {
+                speedMaxCols.put(key, speedMaxView);
+            }
+
+            resID = getResources().getIdentifier("text" + i + "mMaxDir", "id", getActivity().getPackageName());
+            TextView dirMaxView = (TextView)view.findViewById(resID ); // ex: text1200mMaxDir
+            if(dirMaxView!= null) {
+                dirMaxCols.put(key, dirMaxView);
+            }
+
         }
+
+        defBackGround = ((TextView)view.findViewById(R.id.textSpeedLabel)).getBackground();
     }
     /*
      * Lifecycle
@@ -229,6 +252,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         debugCheckBox = view.findViewById(R.id.debugOn);
         parseCheckBox = view.findViewById(R.id.parseOn);
         altCheckBox =  view.findViewById(R.id.altFixCheck);
+        latLonText = view.findViewById(R.id.latLon);
+        speedDirText = view.findViewById(R.id.speedDir);
+
 
         TextView sendText = view.findViewById(R.id.send_text);
         View sendBtn = view.findViewById(R.id.send_btn);
@@ -514,9 +540,15 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         lastGGA = msg;
         currAlt = msg.get_altitude();
         //appendDebug(" GGA received, alt: " + currAlt + " sats: " + msg.get_satelliteCount());
-        if (!altCheckBox.isChecked()) {
-            altSatText.setText(" Alt:" + getRelativeCurrAlt() + " NrSats: " + msg.get_satelliteCount());
-        }
+        /*if (!altCheckBox.isChecked() || survey.getAltRangeKey(currAlt) == null) {
+            String debugStr = " Alt:" + getRelativeCurrAlt() + " NrSats: " + msg.get_satelliteCount()
+                    + (lastGGA !=null ? "\n" + lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
+                    + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) + " \n" : "" );
+                    altSatText.setText(debugStr);
+        }*/
+        altSatText.setText("alt: " + Math.round(getRelativeCurrAlt()) + "m Sats: " + msg.get_satelliteCount() + " ");
+        latLonText.setText( (lastGGA !=null ? lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
+                + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) : "" ));
     }
 
     @Override
@@ -548,6 +580,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     @Override
     public void HandleVTG(VTG msg) {
         lastVTG = msg;
+
+        speedDirText.setText(Math.round(msg.get_groundSpeedKph()) + "km/h " + Math.round(msg.get_trueTrackMadeGoodDegrees()) + CHR_DEG);
         //appendDebug(" VTG speed: " + msg.get_groundSpeedKph() + "kph true dir: " + msg.get_trueTrackMadeGoodDegrees());
         Map.Entry<Float, Float> medianSpeedEntry = null;
 
@@ -558,14 +592,14 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                 medianSpeedEntry = survey.addSpeedData(range, msg.get_groundSpeedKph(), msg.get_trueTrackMadeGoodDegrees());
 
             if (medianSpeedEntry != null) {
-                String debugStr = " Alt:" + getRelativeCurrAlt()
+                /*String debugStr = " Alt:" + getRelativeCurrAlt()
                         +  (lastGGA !=null ? " NrSats: " + lastGGA.get_satelliteCount() : "" )
                         + " Spd: " + medianSpeedEntry.getKey()
                         + " Dir: " + medianSpeedEntry.getValue()
                         + (lastGGA !=null ? "\n" + lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
                             + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) + " \n" : "" );
-                appendDebug( debugStr + " Range: " + range.intValue() );
-                altSatText.setText(debugStr);
+                // appendDebug( debugStr + " Range: " + range.intValue() );
+                altSatText.setText(debugStr);*/
                 updateUI(range, medianSpeedEntry);
             }
         }
@@ -573,14 +607,61 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     private void updateUI(Integer range, Map.Entry<Float, Float> medianSpeedEntry) {
-            TextView speedText = speedCols.get(range);
-            if(speedText != null) {
-                speedText.setText(medianSpeedEntry.getKey().floatValue() + " km/h");
+        TextView speedText = speedCols.get(range);
+        if(speedText != null) {
+            speedText.setText(Math.round(medianSpeedEntry.getKey().floatValue()) + " km/h");
+            //((TableRow)speedText.getParent()).setBackgroundColor(Color.parseColor("#55FF55"));
+            if(!survey.isRangeLocked(range)) {
+                speedText.setBackgroundColor(Color.parseColor("#55FF55"));
+                speedText.setTextColor(Color.parseColor("#000000"));
             }
 
-            TextView dirText = dirCols.get(range);
-            if(dirText != null) {
-                dirText.setText(medianSpeedEntry.getValue().floatValue() + " deg");
+            TextView speedTextPrevRange = speedCols.get(new Integer(range.intValue()-100));
+            if (speedTextPrevRange != null) {
+                //((TableRow)speedTextPrevRange.getParent()).setBackgroundColor(Color.parseColor("#000000"));
+                if(!survey.isRangeLocked(new Integer(range.intValue()-100))) {
+                    speedTextPrevRange.setBackground(defBackGround);
+                    speedTextPrevRange.setTextColor(Color.parseColor("#FFFFFF"));
+                }
             }
+
+            TextView speedTextNextRange = speedCols.get(new Integer(range.intValue()+100));
+            if (speedTextNextRange != null) {
+                //((TableRow)speedTextPrevRange.getParent()).setBackgroundColor(Color.parseColor("#000000"));
+                if(!survey.isRangeLocked(new Integer(range.intValue()+100))) {
+                    speedTextNextRange.setBackground(defBackGround);
+                    speedTextNextRange.setTextColor(Color.parseColor("#FFFFFF"));
+                }
+            }
+
+            TextView speedTextLockRange = speedCols.get(new Integer(range.intValue()-200));
+            if (speedTextLockRange != null) {
+                //((TableRow)speedTextLockRange.getParent()).setBackgroundColor(Color.parseColor("#330000"));
+
+                //speedTextLockRange.setBackgroundColor(Color.parseColor("#330000"));
+                speedTextLockRange.setBackground(defBackGround);
+                speedTextLockRange.setTextColor(Color.parseColor("#FFFFFF"));
+            }
+        }
+
+        TextView dirText = dirCols.get(range);
+        if(dirText != null) {
+            dirText.setText(Math.round(medianSpeedEntry.getValue().floatValue()) + CHR_DEG);
+        }
+
+        Map.Entry<Float, Float> maxSpeedEntry = survey.getMaxSpeedData(range);
+
+        TextView speedMaxText = speedMaxCols.get(range);
+        if(speedMaxText != null) {
+            speedMaxText.setText(Math.round(maxSpeedEntry.getKey().floatValue()) + " km/h");
+        }
+
+        TextView dirMaxText = dirMaxCols.get(range);
+        if(dirMaxText != null) {
+            dirMaxText.setText(Math.round(maxSpeedEntry.getValue().floatValue()) + CHR_DEG);
+        }
+
+
+
     }
 }

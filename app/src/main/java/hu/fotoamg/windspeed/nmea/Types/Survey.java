@@ -1,5 +1,6 @@
 package hu.fotoamg.windspeed.nmea.Types;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,7 +27,7 @@ public class Survey {
         }
     }
 
-    public void rangLock(Integer range, boolean status) {
+    public void rangeLock(Integer range, boolean status) {
         if (status) {
             lockedRanges.add(range);
         } else {
@@ -46,11 +47,26 @@ public class Survey {
         return key;
     }
 
+    public SortedMap<Float, Float> getAltSpeedMap(Integer range) {
+        return altitudeMap.get(range);
+    }
+
+    public Map.Entry<Float, Float> getMaxSpeedData(Integer range) {
+        SortedMap<Float, Float> currAltMap = getAltSpeedMap(range);
+        Float lastKey = currAltMap.lastKey();
+        return new AbstractMap.SimpleEntry<Float, Float>(lastKey, currAltMap.get(lastKey));
+    }
+
+
     private void autoLockLowerRange(Integer currentRange) {
         Integer lowerRange = new Integer(currentRange.intValue()-200);
         if(altitudeMap.containsKey(lowerRange)) {
-            lockedRanges.add(lowerRange);
+            rangeLock(lowerRange, true);
         }
+    }
+
+    public boolean isRangeLocked(Integer currentRange) {
+        return lockedRanges.contains(currentRange);
     }
 
     public Map.Entry<Float, Float> addSpeedData(Integer range, float speed, float bearing) {
@@ -58,7 +74,7 @@ public class Survey {
         Map.Entry<Float, Float> medianEntry = null;
         SortedMap<Float, Float> actualAltMap = altitudeMap.get(range);
 
-        if (!lockedRanges.contains(range) && actualAltMap != null) {
+        if (!isRangeLocked(range) && actualAltMap != null) {
             actualAltMap.put(new Float(speed), new Float(bearing));
         }
         int medianIndex = (actualAltMap.size())/2;

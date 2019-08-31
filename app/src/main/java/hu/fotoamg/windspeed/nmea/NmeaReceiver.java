@@ -165,6 +165,9 @@ public class NmeaReceiver {
             int crOffset = index + count - 2;
             int lnOffset = index + count - 1;
             int cksumOffset = index + count - 5;
+            if ((char)bytes[cksumOffset] != DELIM_CKSUM) {
+                cksumOffset++;
+            }
             int payloadLen = cksumOffset - 1;
 
             // .... Sanity check
@@ -174,9 +177,9 @@ public class NmeaReceiver {
             if ((char)bytes[somOffset] != DELIM_SOM) {
                 invokeOnNmeaMessageDropped(bytes, index, count, "Invalid start of message");
             }
-            if ((char)bytes[crOffset] != DELIM_CR) {
+          /*  if ((char)bytes[crOffset] != DELIM_CR) {
                 invokeOnNmeaMessageDropped(bytes, index, count, "Invalid end of message delimiter (no CR)");
-            }
+            }*/
             if ((char)bytes[lnOffset] != DELIM_LF) {
                 invokeOnNmeaMessageDropped(bytes, index, count, "Invalid end of message delimiter (no LF)");
             }
@@ -194,7 +197,8 @@ public class NmeaReceiver {
             }
 
             // ... Split up the NMEA sentence into parameters/tokens
-            String nmeaSentence = new String(bytes, index + 1, payloadLen, StandardCharsets.US_ASCII );
+            String nmeaSentence = (new String(bytes, index + 1, payloadLen, StandardCharsets.US_ASCII )).trim();
+
             String[] tokens = nmeaSentence.split(DELIMS, -1);
 
             // ... Parse by NMEA data type

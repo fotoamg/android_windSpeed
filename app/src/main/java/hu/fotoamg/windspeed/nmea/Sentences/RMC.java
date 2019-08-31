@@ -109,11 +109,14 @@ public class RMC extends BaseNmeaMessage {
 
     @Override
     public RMC parseFields( String[] tokens ) {
-        set_dataTypeName( tokens[0].trim().substring(1) );
-        if (tokens[9].length() + tokens[1].length() > 10) set_utc( DateTime.parse( tokens[9] + " " + tokens[1], _utcFormatter )) ;
-        set_status( StatusEnum.FromNmeaString(tokens[2]) );
-        set_latitude( Latitude.Parse(tokens[3]+ DELIM_FIELDS + tokens[4], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact) );
-        set_longitude( Longitude.Parse(tokens[5]+ DELIM_FIELDS + tokens[6], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact) );
+        set_dataTypeName(tokens[0].trim().substring(1));
+        if (tokens[9].length() + tokens[1].length() > 10)
+            set_utc(DateTime.parse(tokens[9] + " " + tokens[1], _utcFormatter));
+        set_status(StatusEnum.FromNmeaString(tokens[2]));
+        if (!tokens[3].isEmpty() && !tokens[4].isEmpty() && !tokens[5].isEmpty() && !tokens[6].isEmpty() ) {
+            set_latitude(Latitude.Parse(tokens[3] + DELIM_FIELDS + tokens[4], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact));
+            set_longitude(Longitude.Parse(tokens[5] + DELIM_FIELDS + tokens[6], GeoAngleFormat.DMM, GeoAngleFormatOptions.Compact));
+        }
         if (tokens[7].length() > 0) set_speedAboveGroundKnots( Float.parseFloat(tokens[7]) );
         if (tokens[8].length() > 0) set_trackAngleTrueNorthDegrees( Float.parseFloat(tokens[8]) );
 
