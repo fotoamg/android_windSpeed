@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
@@ -57,6 +58,7 @@ import hu.fotoamg.windspeed.nmea.Sentences.RMC;
 import hu.fotoamg.windspeed.nmea.Sentences.VTG;
 import hu.fotoamg.windspeed.nmea.Types.GeoAngleFormat;
 import hu.fotoamg.windspeed.nmea.Types.GeoAngleFormatOptions;
+import hu.fotoamg.windspeed.nmea.Types.RangeSpeedInfo;
 import hu.fotoamg.windspeed.nmea.Types.Survey;
 
 import java.nio.charset.StandardCharsets;
@@ -67,6 +69,7 @@ import java.util.TreeMap;
 
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener, INmeaHandler {
     public static final String CHR_DEG = "\u00b0";
+    public static final int MAX_UI_ALT = 1300;
     //Permision code that will be checked in the method onRequestPermissionsResult
     private int STORAGE_PERMISSION_CODE = 23;
 
@@ -75,6 +78,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private StringBuffer debugMsg = new StringBuffer();
     private String deviceAddress;
     private String newline = "\r\n";
+
+    private View mainFragment;
 
     private TextView receiveText;
     private TextView debugText;
@@ -114,12 +119,18 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     void initTextCols(View view) {
         //TextView sendText = view.findViewById(R.id.send_text);
-        for(int i = 0; i<1300; i+=100) {
+        for(int i = 0; i<MAX_UI_ALT; i+=100) {
             Integer key = new Integer(i);
             int resID = getResources().getIdentifier("text" + i + "mSpd", "id", getActivity().getPackageName());
             TextView speedView = (TextView)view.findViewById(resID ); // ex: text1200mSpd
             if(speedView!= null) {
+
                 speedCols.put(key, speedView);
+                speedView.setLongClickable(true);
+                speedView.setOnLongClickListener( v -> {
+                    longSpeedClick(key);
+                    return true;
+                });
             }
 
             resID = getResources().getIdentifier("text" + i + "mDir", "id", getActivity().getPackageName());
@@ -176,6 +187,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                 appendDebug("Ignored: " + sentence ) ;
             }
         } ) ;
+
     }
 
     @Override
@@ -244,6 +256,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_terminal, container, false);
+        mainFragment = view;
         receiveText = view.findViewById(R.id.receive_text);                          // TextView performance decreases with number of spans
         receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
         //receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -266,6 +279,15 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         altSatText = view.findViewById(R.id.altSatCount);
         initTextCols(view);
 
+        updateAltText();
+        for(int i = 0; i<MAX_UI_ALT; i+=100) {
+            Integer key = new Integer(i);
+            RangeSpeedInfo rangeObj = survey.getRangeSpeedInfo(key);
+            if (rangeObj.getCount() > 0) {
+                restoreUI(rangeObj);
+            }
+        }
+
         return view;
     }
 
@@ -278,14 +300,10 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.clear) {
-            /*Toast.makeText(getContext(), "CLEAR",
-                    Toast.LENGTH_LONG).show();*/
             appendDebug("CLEAR clicked");
             receiveText.setText("");
             return true;
         } else if (id ==R.id.newline) {
-            /*Toast.makeText(getContext(), "NEWLINE",
-                    Toast.LENGTH_LONG).show();*/
             appendDebug("NEWLINE clicked");
             String[] newlineNames = getResources().getStringArray(R.array.newline_names);
             String[] newlineValues = getResources().getStringArray(R.array.newline_values);
@@ -299,8 +317,6 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             builder.create().show();
             return true;
         } else if (id ==R.id.savelog) {
-            /*Toast.makeText(getContext(), "SAVELOGGGG",
-                    Toast.LENGTH_LONG).show();*/
             appendDebug("saveLog clicked");
             saveLog();
             return true;
@@ -397,6 +413,31 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     public void resetClick(View view) {
         debugText.setText("Debug msg:");
         appendDebug(" RESET pushed!\n");
+    }
+
+
+    private void showDialog(String msg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Details");
+        builder.setMessage(msg);
+        builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int id) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+    public void longSpeedClick(Integer range) {
+        RangeSpeedInfo rangeObj = survey.getRangeSpeedInfo(range);
+        String moreSpeedInfo = "Nr: " + rangeObj.getCount() + " Avg: " + rangeObj.getAvgSpeed()
+                + "\nValues: " + rangeObj.getSpeedDirValues().keySet().toString();
+        String moreDirInfo = "Avg: " + rangeObj.getAvgDir()
+                + "\nValues: " + rangeObj.getSpeedDirValues().values().toString();
+        showDialog("Altitude " + range.intValue() + "m"
+                + (rangeObj.isLocked() ? " LOCKED" : " OPEN")
+                + "\nSpeed " + moreSpeedInfo
+                + "\n\n Heading " + moreDirInfo);
     }
 
 
@@ -535,20 +576,20 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         return Math.round((currAlt-baseAlt));
     }
 
+
+    private void updateAltText(){
+        if (lastGGA != null) {
+            altSatText.setText("alt: " + Math.round(getRelativeCurrAlt()) + "m Sats: " + lastGGA.get_satelliteCount() + " ");
+            latLonText.setText( (lastGGA.get_latitude() !=null ? lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
+                    + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) : "" ));
+        }
+    }
+
     @Override
     public void HandleGGA(GGA msg) {
         lastGGA = msg;
         currAlt = msg.get_altitude();
-        //appendDebug(" GGA received, alt: " + currAlt + " sats: " + msg.get_satelliteCount());
-        /*if (!altCheckBox.isChecked() || survey.getAltRangeKey(currAlt) == null) {
-            String debugStr = " Alt:" + getRelativeCurrAlt() + " NrSats: " + msg.get_satelliteCount()
-                    + (lastGGA !=null ? "\n" + lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
-                    + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) + " \n" : "" );
-                    altSatText.setText(debugStr);
-        }*/
-        altSatText.setText("alt: " + Math.round(getRelativeCurrAlt()) + "m Sats: " + msg.get_satelliteCount() + " ");
-        latLonText.setText( (lastGGA !=null ? lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
-                + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) : "" ));
+        updateAltText();
     }
 
     @Override
@@ -587,26 +628,23 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
         if(parseCheckBox.isChecked() && altCheckBox.isChecked()) {
             Integer range = survey.getAltRangeKey(getRelativeCurrAlt());
-
-            if (range != null)
-                medianSpeedEntry = survey.addSpeedData(range, msg.get_groundSpeedKph(), msg.get_trueTrackMadeGoodDegrees());
-
-            if (medianSpeedEntry != null) {
-                /*String debugStr = " Alt:" + getRelativeCurrAlt()
-                        +  (lastGGA !=null ? " NrSats: " + lastGGA.get_satelliteCount() : "" )
-                        + " Spd: " + medianSpeedEntry.getKey()
-                        + " Dir: " + medianSpeedEntry.getValue()
-                        + (lastGGA !=null ? "\n" + lastGGA.get_latitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits)
-                            + ", " + lastGGA.get_longitude().ToString(GeoAngleFormat.DDD, GeoAngleFormatOptions.ShowUnits) + " \n" : "" );
-                // appendDebug( debugStr + " Range: " + range.intValue() );
-                altSatText.setText(debugStr);*/
-                updateUI(range, medianSpeedEntry);
+            if (range != null) {
+                RangeSpeedInfo rangeObj = survey.addSpeedData(range, msg.get_groundSpeedKph(), msg.get_trueTrackMadeGoodDegrees());
+                if (rangeObj != null) {
+                    medianSpeedEntry = rangeObj.getMedianSpeedData();
+                    if (medianSpeedEntry != null) {
+                        updateUI(rangeObj);
+                }
+                }
             }
+
         }
 
     }
 
-    private void updateUI(Integer range, Map.Entry<Float, Float> medianSpeedEntry) {
+    private void updateUI(RangeSpeedInfo rangeObj) {
+        Integer range = rangeObj.getRangeKey();
+        Map.Entry<Float, Float> medianSpeedEntry = rangeObj.getMedianSpeedData();
         TextView speedText = speedCols.get(range);
         if(speedText != null) {
             speedText.setText(Math.round(medianSpeedEntry.getKey().floatValue()) + " km/h");
@@ -627,7 +665,6 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
             TextView speedTextNextRange = speedCols.get(new Integer(range.intValue()+100));
             if (speedTextNextRange != null) {
-                //((TableRow)speedTextPrevRange.getParent()).setBackgroundColor(Color.parseColor("#000000"));
                 if(!survey.isRangeLocked(new Integer(range.intValue()+100))) {
                     speedTextNextRange.setBackground(defBackGround);
                     speedTextNextRange.setTextColor(Color.parseColor("#FFFFFF"));
@@ -636,9 +673,6 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
             TextView speedTextLockRange = speedCols.get(new Integer(range.intValue()-200));
             if (speedTextLockRange != null) {
-                //((TableRow)speedTextLockRange.getParent()).setBackgroundColor(Color.parseColor("#330000"));
-
-                //speedTextLockRange.setBackgroundColor(Color.parseColor("#330000"));
                 speedTextLockRange.setBackground(defBackGround);
                 speedTextLockRange.setTextColor(Color.parseColor("#FFFFFF"));
             }
@@ -661,7 +695,27 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             dirMaxText.setText(Math.round(maxSpeedEntry.getValue().floatValue()) + CHR_DEG);
         }
 
+    }
 
-
+    private void restoreUI(RangeSpeedInfo rangeObj) {
+        Integer range = rangeObj.getRangeKey();
+        Map.Entry<Float, Float> medianSpeedEntry = rangeObj.getMedianSpeedData();
+        TextView speedText = speedCols.get(range);
+        if(speedText != null) {
+            speedText.setText(Math.round(medianSpeedEntry.getKey().floatValue()) + " km/h");
+        }
+        TextView dirText = dirCols.get(range);
+        if(dirText != null) {
+            dirText.setText(Math.round(medianSpeedEntry.getValue().floatValue()) + CHR_DEG);
+        }
+        Map.Entry<Float, Float> maxSpeedEntry = survey.getMaxSpeedData(range);
+        TextView speedMaxText = speedMaxCols.get(range);
+        if(speedMaxText != null) {
+            speedMaxText.setText(Math.round(maxSpeedEntry.getKey().floatValue()) + " km/h");
+        }
+        TextView dirMaxText = dirMaxCols.get(range);
+        if(dirMaxText != null) {
+            dirMaxText.setText(Math.round(maxSpeedEntry.getValue().floatValue()) + CHR_DEG);
+        }
     }
 }

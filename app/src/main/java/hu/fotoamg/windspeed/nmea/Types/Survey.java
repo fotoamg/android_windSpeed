@@ -11,8 +11,7 @@ import java.util.TreeMap;
 
 public class Survey {
     public static final int ALT_RADIUS = 20;
-    Map<Integer, SortedMap<Float, Float>> altitudeMap  = new HashMap<>();
-    Set<Integer> lockedRanges = new HashSet<>();
+    Map<Integer, RangeSpeedInfo> altitudeMap  = new HashMap<>();
 
     public Survey() {
         super();
@@ -20,19 +19,16 @@ public class Survey {
     }
 
     public void initMap() {
-        lockedRanges.clear();
         altitudeMap.clear();
         for(int i = 0; i<2100; i+=100) {
-            altitudeMap.put(new Integer(i), new TreeMap<Float, Float>());
+            altitudeMap.put(new Integer(i), new RangeSpeedInfo(new Integer(i)));
         }
     }
 
     public void rangeLock(Integer range, boolean status) {
-        if (status) {
-            lockedRanges.add(range);
-        } else {
-            lockedRanges.remove(range);
-        }
+        RangeSpeedInfo rangeObj = altitudeMap.get(range);
+        if (rangeObj != null)
+            rangeObj.setLocked(status);
     }
 
     public Integer getAltRangeKey(float alt) {
@@ -47,14 +43,19 @@ public class Survey {
         return key;
     }
 
-    public SortedMap<Float, Float> getAltSpeedMap(Integer range) {
+    public RangeSpeedInfo getRangeSpeedInfo(Integer range) {
         return altitudeMap.get(range);
     }
 
     public Map.Entry<Float, Float> getMaxSpeedData(Integer range) {
-        SortedMap<Float, Float> currAltMap = getAltSpeedMap(range);
-        Float lastKey = currAltMap.lastKey();
-        return new AbstractMap.SimpleEntry<Float, Float>(lastKey, currAltMap.get(lastKey));
+        Map.Entry<Float, Float> result = null;
+        RangeSpeedInfo rangeObj = getRangeSpeedInfo(range);
+        if (rangeObj != null) {
+            SortedMap<Float, Float> currAltMap = rangeObj.getSpeedDirValues();
+            Float lastKey = currAltMap.lastKey();
+            result = new AbstractMap.SimpleEntry<Float, Float>(lastKey, currAltMap.get(lastKey));
+        }
+        return result;
     }
 
 
@@ -65,32 +66,24 @@ public class Survey {
         }
     }
 
-    public boolean isRangeLocked(Integer currentRange) {
-        return lockedRanges.contains(currentRange);
+    public boolean isRangeLocked(Integer range) {
+        boolean result = false;
+        RangeSpeedInfo rangeObj = getRangeSpeedInfo(range);
+        if (rangeObj != null) {
+            result = rangeObj.isLocked();
+        }
+        return result;
     }
 
-    public Map.Entry<Float, Float> addSpeedData(Integer range, float speed, float bearing) {
+    public RangeSpeedInfo addSpeedData(Integer range, float speed, float bearing) {
         autoLockLowerRange(range);
-        Map.Entry<Float, Float> medianEntry = null;
-        SortedMap<Float, Float> actualAltMap = altitudeMap.get(range);
-
-        if (!isRangeLocked(range) && actualAltMap != null) {
-            actualAltMap.put(new Float(speed), new Float(bearing));
-        }
-        int medianIndex = (actualAltMap.size())/2;
-        Set mapEntrySet = actualAltMap.entrySet();
-        Iterator mapIterator = mapEntrySet.iterator();
-        int counter = 0;
-        while (mapIterator.hasNext() && (counter <= medianIndex))
-        {
-            Map.Entry<Float, Float> m = (Map.Entry<Float, Float>)mapIterator.next();
-            if (counter >= medianIndex) {
-                medianEntry = m;
-                break;
+        RangeSpeedInfo rangeObj = getRangeSpeedInfo(range);
+        if (rangeObj != null) {
+            if (!rangeObj.isLocked()) {
+                rangeObj.insertSpeedData(speed, bearing);
             }
-            counter++;
         }
-        return medianEntry;
+        return rangeObj;
     }
 
 }

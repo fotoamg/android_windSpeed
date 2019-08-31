@@ -12,9 +12,14 @@ Current version is modified to collect data by a quadcopter and having the trans
 
 ![Image of Screen](doc/screendev1.jpg) 
 
-![Image of Screen](doc/screen1.jpg) 
+![Image of Screen](doc/screen1.png) 
 
-![Image of Screen](doc/windparse1.jpg) 
+![Image of Screen](doc/screen2.png) 
+
+![Image of Screen](doc/screen3.png) 
+
+![Image of Screen](doc/screen4.png) 
+
 
 ## The Original App used here for BT2.0 serial communication:
 
